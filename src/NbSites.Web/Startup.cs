@@ -9,6 +9,7 @@ namespace NbSites.Web
     {
         public void ConfigureServices(IServiceCollection services)
         {
+            //services.AddMvc();
             services.AddControllersWithViews();
         }
 
@@ -26,9 +27,9 @@ namespace NbSites.Web
             
             app.UseEndpoints(endpoints =>
             {
-                //endpoints.MapDefaultControllerRoute();
-                endpoints.MapControllerRoute(name: "default",
-                    pattern: "{controller=Home}/{action=Index}/{id?}");
+                endpoints.MapDefaultControllerRoute();
+                //endpoints.MapControllerRoute(name: "default",
+                //    pattern: "{controller=Home}/{action=Index}/{id?}");
             });
         }
     }

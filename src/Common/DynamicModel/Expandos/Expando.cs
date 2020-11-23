@@ -141,15 +141,13 @@ namespace Common.DynamicModel.Expandos
                 }
             }
         }
-
-
+        
         protected void Initialize(object instance)
         {
             Instance = instance;
             if (instance != null)
                 InstanceType = instance.GetType();
         }
-
 
         /// <summary>
         /// Return both instance and dynamic names.
@@ -160,12 +158,12 @@ namespace Common.DynamicModel.Expandos
         /// <returns></returns>
         public override IEnumerable<string> GetDynamicMemberNames()
         {
-            //add expando property filter for extensions
-            var names = GetProperties(true).Select(x => x.Key).ToList();
-            return ExpandoPropertyFilter.Resolve != null ? ExpandoPropertyFilter.Resolve().Filter(names) : names;
+            foreach (var item in GetProperties(true))
+            {
+                yield return item.Key;
+            }
         }
-
-
+        
         /// <summary>
         /// Try to retrieve a member by name first from instance properties
         /// followed by the collection entries.
@@ -199,8 +197,7 @@ namespace Common.DynamicModel.Expandos
             result = null;
             return false;
         }
-
-
+        
         /// <summary>
         /// Property setter implementation tries to retrieve value from instance 
         /// first then into this object
@@ -255,8 +252,7 @@ namespace Common.DynamicModel.Expandos
             result = null;
             return false;
         }
-
-
+        
         /// <summary>
         /// Reflection Helper method to retrieve a property
         /// </summary>
@@ -337,11 +333,7 @@ namespace Common.DynamicModel.Expandos
             result = null;
             return false;
         }
-
-
-
-
-
+        
         /// <summary>
         /// Convenience method that provides a string Indexer 
         /// to the Properties collection AND the strongly typed
@@ -397,8 +389,7 @@ namespace Common.DynamicModel.Expandos
                     Properties[key] = value;
             }
         }
-
-
+        
         /// <summary>
         /// Returns and the properties of 
         /// </summary>
@@ -416,8 +407,7 @@ namespace Common.DynamicModel.Expandos
                 yield return new KeyValuePair<string, object>(key, this.Properties[key]);
 
         }
-
-
+        
         /// <summary>
         /// Checks whether a property exists in the Property collection
         /// or as a property on the instance
@@ -441,8 +431,7 @@ namespace Common.DynamicModel.Expandos
 
             return false;
         }
-
-
+        
         /// <summary>
         /// Converts an <see cref="IDictionary&lt;string, object&gt;"/> into an <see cref="Expando"/>
         /// </summary>
@@ -487,6 +476,5 @@ namespace Common.DynamicModel.Expandos
             }
             return expando;
         }
-
     }
 }
