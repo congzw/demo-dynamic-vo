@@ -2,7 +2,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Common
 {
-    [TestClass]
+    //[TestClass]
     public class Template
     {
         [TestMethod]

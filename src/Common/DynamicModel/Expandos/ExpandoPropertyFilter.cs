@@ -22,16 +22,11 @@ namespace Common.DynamicModel.Expandos
 
         public bool IncludeProp(PropertyInfo propertyInfo)
         {
-            //Fix diff json lib for: MS Or Newton
-            //if (propertyInfo.GetCustomAttribute<JsonIgnoreAttribute>() != null)
-            //{
-            //    return false;
-            //}
-            //todo cache?
             var attributes = propertyInfo.GetCustomAttributes().ToList();
             foreach (var attribute in attributes)
             {
-                if (attribute.GetType().Name.Contains("JsonIgnore", StringComparison.OrdinalIgnoreCase))
+                //JsonIgnore, XmlIgnore, SoapIgnore, JsonIgnore[System.Text.Json.Serialization, Newtonsoft.Json]
+                if (attribute.GetType().Name.Contains("Ignore", StringComparison.OrdinalIgnoreCase))
                 {
                     return false;
                 }
