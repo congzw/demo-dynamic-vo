@@ -44,7 +44,13 @@ namespace Common.DynamicModel.Expandos
             get
             {
                 if (_InstancePropertyInfo == null && Instance != null)
-                    _InstancePropertyInfo = Instance.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly);
+                {
+                    //fix indexer "item" bug!
+                    //instance props should not include the indexer: this[""] => "item"
+                    InstanceType = Instance.GetType();
+                    var propertyInfos = InstanceType.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly | BindingFlags.GetProperty);
+                    _InstancePropertyInfo = propertyInfos.Where(x => x.GetIndexParameters().Length == 0).ToArray();
+                }
                 return _InstancePropertyInfo;
             }
         }
