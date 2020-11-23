@@ -160,8 +160,9 @@ namespace Common.DynamicModel.Expandos
         /// <returns></returns>
         public override IEnumerable<string> GetDynamicMemberNames()
         {
-            foreach (var prop in GetProperties(true))
-                yield return prop.Key;
+            //add expando property filter for extensions
+            var names = GetProperties(true).Select(x => x.Key).ToList();
+            return ExpandoPropertyFilter.Resolve != null ? ExpandoPropertyFilter.Resolve().Filter(names) : names;
         }
 
 
