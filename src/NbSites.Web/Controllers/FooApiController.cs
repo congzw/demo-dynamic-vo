@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using Common.DynamicModel;
 using Common.DynamicModel.Expandos;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
@@ -33,7 +30,7 @@ namespace NbSites.Web.Controllers
         public string GetVo2()
         {
             var fooVo = new FooVo2();
-            var expando = new LazyExpando(fooVo);
+            var expando = new ExpandoLazy(fooVo);
             expando.SetPropertyFilter(ExpandoPropertyFilter.Create("bad"));
 
             dynamic dynamicVo = expando;
@@ -46,7 +43,7 @@ namespace NbSites.Web.Controllers
         [HttpGet("GetVo3")]
         public string GetVo3()
         {
-            var expando = new LazyExpando();
+            var expando = new ExpandoLazy();
             expando.SetPropertyFilter(ExpandoPropertyFilter.Create("bad"));
 
             dynamic dynamicVo = expando;
@@ -106,7 +103,7 @@ namespace NbSites.Web.Controllers
         }
     }
 
-    public class FooVo : LazyExpando
+    public class FooVo : ExpandoLazy
     {
         public string Id { get; set; }
         public string Name { get; set; }
@@ -122,7 +119,7 @@ namespace NbSites.Web.Controllers
         public string Description { get; set; }
     }
 
-    public class FooLazyVo : LazyExpando
+    public class FooLazyVo : ExpandoLazy
     {
         public string Id { get; set; }
         public string Name { get; set; }

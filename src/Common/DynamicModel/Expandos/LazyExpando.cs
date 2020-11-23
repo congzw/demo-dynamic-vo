@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace Common.DynamicModel.Expandos
 {
-    public interface ILazyExpando
+    public interface IExpandoLazy
     {
         void SetPropertyFilter(IExpandoPropertyFilter filter);
         IExpandoPropertyFilter GetPropertyFilter();
@@ -13,16 +13,16 @@ namespace Common.DynamicModel.Expandos
         Task SetAsync<T>(string name, Func<Task<T>> func, bool ignoreFilter = false);
     }
 
-    public class LazyExpando : Expando, ILazyExpando
+    public class ExpandoLazy : Expando, IExpandoLazy
     {
-        public LazyExpando()
+        public ExpandoLazy()
         {
         }
-        public LazyExpando(object instance)
+        public ExpandoLazy(object instance)
             : base(instance)
         {
         }
-        public LazyExpando(IDictionary<string, object> dict)
+        public ExpandoLazy(IDictionary<string, object> dict)
             : base(dict)
         {
         }
