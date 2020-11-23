@@ -104,16 +104,16 @@ namespace Common
             return value;
         }
 
-        public static T Log<T>(this T value)
+        public static T Log<T>(this T value, string prefix = null)
         {
             if (value == null)
             {
-                Trace.WriteLine("null");
+                Trace.WriteLine(prefix + "null");
             }
 
             if (value is string)
             {
-                Trace.WriteLine(value);
+                Trace.WriteLine(prefix + value);
                 return value;
             }
 
@@ -122,11 +122,11 @@ namespace Common
             {
                 foreach (var item in items)
                 {
-                    Trace.WriteLine(item);
+                    Trace.WriteLine(prefix + item);
                 }
                 return value;
             }
-            Trace.WriteLine(value);
+            Trace.WriteLine(prefix + value);
             return value;
         }
 

@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 
 namespace Common.DynamicModel.Expandos
 {
     public interface IExpandoPropertyFilter
     {
         public bool Include(string propName);
+        public bool IncludeProp(PropertyInfo propertyInfo);
     }
 
     public class ExpandoPropertyFilter : IExpandoPropertyFilter
@@ -16,6 +18,25 @@ namespace Common.DynamicModel.Expandos
         public bool Include(string propName)
         {
             return !Excludes.Any(x => propName.Equals(x, StringComparison.OrdinalIgnoreCase));
+        }
+
+        public bool IncludeProp(PropertyInfo propertyInfo)
+        {
+            //Fix diff json lib for: MS Or Newton
+            //if (propertyInfo.GetCustomAttribute<JsonIgnoreAttribute>() != null)
+            //{
+            //    return false;
+            //}
+            //todo cache?
+            var attributes = propertyInfo.GetCustomAttributes().ToList();
+            foreach (var attribute in attributes)
+            {
+                if (attribute.GetType().Name.Contains("JsonIgnore", StringComparison.OrdinalIgnoreCase))
+                {
+                    return false;
+                }
+            }
+            return true;
         }
 
         public static ExpandoPropertyFilter Create(params string[] excludes)

@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 
 namespace Common.DynamicModel.Expandos
@@ -11,6 +13,8 @@ namespace Common.DynamicModel.Expandos
 
         void Set<T>(string name, Func<T> func, bool ignoreFilter = false);
         Task SetAsync<T>(string name, Func<Task<T>> func, bool ignoreFilter = false);
+
+        void Merge(object instance, bool greedy = true);
     }
 
     public class MyExpando : Expando, IMyExpando
@@ -37,18 +41,33 @@ namespace Common.DynamicModel.Expandos
         {
             return _propertyFilter ?? ExpandoPropertyFilter.Resolve();
         }
-
-        public override IEnumerable<string> GetDynamicMemberNames()
+        
+        protected override IEnumerable<KeyValuePair<string, object>> GetProperties(bool includeInstanceProperties = false)
         {
-            var memberNames = base.GetDynamicMemberNames();
-            //add expando property filter for extensions
+            var props = base.GetProperties(includeInstanceProperties);
+
             var filter = GetPropertyFilter();
-            foreach (var item in memberNames)
+            var ignorePropInfos = new List<PropertyInfo>();
+            foreach (var propertyInfo in InstancePropertyInfo)
             {
-                if (filter.Include(item))
+                if (!filter.IncludeProp(propertyInfo))
                 {
-                    yield return item;
+                    ignorePropInfos.Add(propertyInfo);
                 }
+            }
+
+            foreach (var prop in props)
+            {
+                if (!filter.Include(prop.Key))
+                {
+                    continue;
+                }
+
+                if (ignorePropInfos.Any(x => prop.Key.Equals(x.Name, StringComparison.OrdinalIgnoreCase)))
+                {
+                    continue;
+                }
+                yield return prop;
             }
         }
 
@@ -83,6 +102,53 @@ namespace Common.DynamicModel.Expandos
             {
                 this[name] = await func.Invoke();
             }
+        }
+
+        public void Merge(object instance, bool greedy = true)
+        {
+            if (instance == null)
+            {
+                return;
+            }
+
+            var propertyInfos = instance.GetType()
+                    .GetProperties(BindingFlags.Instance | BindingFlags.GetProperty | BindingFlags.Public)
+                    .ToList();
+
+            foreach (var propertyInfo in propertyInfos)
+            {
+                var prop = propertyInfo;
+                if (!GetPropertyFilter().IncludeProp(propertyInfo))
+                {
+                    continue;
+                }
+
+                if (greedy)
+                {
+                    Set(prop.Name, () => prop.GetValue(instance, null));
+                }
+                else
+                {
+                    if (PropertyExist(prop.Name))
+                    {
+                        Set(prop.Name, () => prop.GetValue(instance, null));
+                    }
+                }
+
+            }
+        }
+
+        protected bool PropertyExist(string prop)
+        {
+            var selfPropNames = GetProperties(true).Select(x => x.Key);
+            foreach (var selfPropName in selfPropNames)
+            {
+                if (selfPropName.Equals(prop, StringComparison.OrdinalIgnoreCase))
+                {
+                    return true;
+                }
+            }
+            return false;
         }
     }
 }

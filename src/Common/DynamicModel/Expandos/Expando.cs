@@ -39,7 +39,7 @@ namespace Common.DynamicModel.Expandos
         /// </summary>
         Type InstanceType;
 
-        PropertyInfo[] InstancePropertyInfo
+        protected PropertyInfo[] InstancePropertyInfo
         {
             get
             {
@@ -395,7 +395,7 @@ namespace Common.DynamicModel.Expandos
         /// </summary>
         /// <param name="includeProperties"></param>
         /// <returns></returns>
-        public IEnumerable<KeyValuePair<string, object>> GetProperties(bool includeInstanceProperties = false)
+        protected virtual IEnumerable<KeyValuePair<string, object>> GetProperties(bool includeInstanceProperties = false)
         {
             if (includeInstanceProperties && Instance != null)
             {
