@@ -5,12 +5,12 @@ using Newtonsoft.Json;
 namespace Common.DynamicModel
 {
     [TestClass]
-    public class ExpandoLazySpec
+    public class MyExpandoSpec
     {
         [TestMethod]
         public void Set_NoFilter_Should_Ok()
         {
-            var fooVo = new FooLazyVo();
+            var fooVo = new FooVo();
 
             fooVo["a"] = "111";
             fooVo.Set("b", () => "222");
@@ -38,7 +38,7 @@ namespace Common.DynamicModel
         [TestMethod]
         public void Set_WithFilter_Should_Ok()
         {
-            var fooVo = new FooLazyVo();
+            var fooVo = new FooVo();
             fooVo.SetPropertyFilter(ExpandoPropertyFilter.Create("check1"));
 
             fooVo["a"] = "111";
@@ -63,11 +63,5 @@ namespace Common.DynamicModel
             json.Contains("check1Invoked:true").ShouldFalse();
             json.Contains("check2Invoked:true").ShouldTrue();
         }
-    }
-
-    public class FooLazyVo : ExpandoLazy
-    {
-        public string Id { get; set; }
-        public string Name { get; set; }
     }
 }

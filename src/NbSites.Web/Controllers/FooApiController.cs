@@ -30,7 +30,7 @@ namespace NbSites.Web.Controllers
         public string GetVo2()
         {
             var fooVo = new FooVo2();
-            var expando = new ExpandoLazy(fooVo);
+            var expando = new MyExpando(fooVo);
             expando.SetPropertyFilter(ExpandoPropertyFilter.Create("bad"));
 
             dynamic dynamicVo = expando;
@@ -43,7 +43,7 @@ namespace NbSites.Web.Controllers
         [HttpGet("GetVo3")]
         public string GetVo3()
         {
-            var expando = new ExpandoLazy();
+            var expando = new MyExpando();
             expando.SetPropertyFilter(ExpandoPropertyFilter.Create("bad"));
 
             dynamic dynamicVo = expando;
@@ -103,7 +103,7 @@ namespace NbSites.Web.Controllers
         }
     }
 
-    public class FooVo : ExpandoLazy
+    public class FooVo : MyExpando
     {
         public string Id { get; set; }
         public string Name { get; set; }
@@ -119,7 +119,7 @@ namespace NbSites.Web.Controllers
         public string Description { get; set; }
     }
 
-    public class FooLazyVo : ExpandoLazy
+    public class FooLazyVo : MyExpando
     {
         public string Id { get; set; }
         public string Name { get; set; }
