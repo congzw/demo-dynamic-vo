@@ -371,26 +371,15 @@ namespace Common.DynamicModel.Expandos
         {
             get
             {
-                //wrap with lazy
-                if (LazyBag.TryGetLazyProp(key, out var theValue))
-                {
-                    return theValue;
-                }
-                
                 // try reflection on instanceType
                 if (GetProperty(Instance, key, out var result))
                     return result;
 
-                return null;
+                //wrap with lazy
+                return LazyBag.TryGetLazyProp(key, out var theValue);
             }
             set
             {
-                if (!LazyBag.TryGetLazyProp(key, out var result))
-                {
-                    LazyBag.TrySetLazyProp(key, value);
-                    return;
-                }
-
                 // check instance for existance of type first
                 var miArray = InstanceType.GetMember(key, BindingFlags.Public | BindingFlags.GetProperty | BindingFlags.Instance);
                 if (miArray.Length > 0)
@@ -399,7 +388,6 @@ namespace Common.DynamicModel.Expandos
                 }
                 else
                 {
-                    //Properties[key] = value;
                     //wrap with lazy
                     LazyBag.TrySetLazyProp(key, value);
                 }

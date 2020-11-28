@@ -52,115 +52,6 @@ namespace Common.DynamicModel.Expandos
             var filter = GetPropertyFilter();
             return base.GetReturnInstancePropertyInfos().Where(x => filter.IncludeInstanceProperty(x));
         }
-        
-        //protected override IEnumerable<KeyValuePair<string, object>> GetProperties(bool includeInstanceProperties = false)
-        //{
-        //    var props = base.GetProperties(includeInstanceProperties);
-
-        //    var filter = GetPropertyFilter();
-        //    var ignorePropInfos = new List<PropertyInfo>();
-        //    foreach (var propertyInfo in InstancePropertyInfo)
-        //    {
-        //        if (!filter.IncludeProp(propertyInfo))
-        //        {
-        //            ignorePropInfos.Add(propertyInfo);
-        //        }
-        //    }
-
-        //    foreach (var prop in props)
-        //    {
-        //        if (!filter.Include(prop.Key))
-        //        {
-        //            continue;
-        //        }
-
-        //        if (ignorePropInfos.Any(x => prop.Key.Equals(x.Name, StringComparison.OrdinalIgnoreCase)))
-        //        {
-        //            continue;
-        //        }
-        //        yield return prop;
-        //    }
-        //}
-
-        //public void Set<TProperty>(string name, TProperty value, bool ignoreFilter = false)
-        //{
-        //    Set(name, () => value, ignoreFilter);
-        //}
-
-        //public void Set<T>(string name, Func<T> func, bool ignoreFilter = false)
-        //{
-        //    if (ignoreFilter)
-        //    {
-        //        this[name] = func.Invoke();
-        //        return;
-        //    }
-
-        //    if (GetPropertyFilter().Include(name))
-        //    {
-        //        this[name] = func.Invoke();
-        //    }
-        //}
-
-        //public async Task SetAsync<T>(string name, Func<Task<T>> func, bool ignoreFilter = false)
-        //{
-        //    if (ignoreFilter)
-        //    {
-        //        this[name] = func.Invoke();
-        //        return;
-        //    }
-
-        //    if (GetPropertyFilter().Include(name))
-        //    {
-        //        this[name] = await func.Invoke();
-        //    }
-        //}
-
-        //public void Merge(object instance, bool greedy = true)
-        //{
-        //    if (instance == null)
-        //    {
-        //        return;
-        //    }
-
-        //    var propertyInfos = instance.GetType()
-        //            .GetProperties(BindingFlags.Instance | BindingFlags.GetProperty | BindingFlags.Public)
-        //            .ToList();
-
-        //    foreach (var propertyInfo in propertyInfos)
-        //    {
-        //        var prop = propertyInfo;
-        //        if (!GetPropertyFilter().IncludeProp(propertyInfo))
-        //        {
-        //            continue;
-        //        }
-
-        //        if (greedy)
-        //        {
-        //            Set(prop.Name, () => prop.GetValue(instance, null));
-        //        }
-        //        else
-        //        {
-        //            if (PropertyExist(prop.Name))
-        //            {
-        //                Set(prop.Name, () => prop.GetValue(instance, null));
-        //            }
-        //        }
-
-        //    }
-        //}
-
-        //protected bool PropertyExist(string prop)
-        //{
-        //    var selfPropNames = GetProperties(true).Select(x => x.Key);
-        //    foreach (var selfPropName in selfPropNames)
-        //    {
-        //        if (selfPropName.Equals(prop, StringComparison.OrdinalIgnoreCase))
-        //        {
-        //            return true;
-        //        }
-        //    }
-        //    return false;
-        //}
 
         public void Set<TProperty>(string name, TProperty value)
         {
@@ -175,6 +66,23 @@ namespace Common.DynamicModel.Expandos
         public void Set<T>(string name, Lazy<T> lazy)
         {
             this[name] = lazy;
+        }
+        
+        public void Merge(object instance)
+        {
+            if (instance == null)
+            {
+                return;
+            }
+
+            var propertyInfos = instance.GetType()
+                    .GetProperties(BindingFlags.Instance | BindingFlags.GetProperty | BindingFlags.Public)
+                    .ToList();
+
+            foreach (var propertyInfo in propertyInfos)
+            {
+                Set(propertyInfo.Name, propertyInfo.GetValue(instance, null));
+            }
         }
     }
 }
