@@ -53,54 +53,54 @@ namespace NbSites.Web.Controllers
             return JsonConvert.SerializeObject(expando, Formatting.Indented);
         }
 
-        [HttpGet("GetLazyVo")]
-        public string GetLazyVo()
-        {
-            var fooVo = new FooLazyVo();
-            fooVo.SetPropertyFilter(ExpandoPropertyFilter.Create("check1"));
-            fooVo["a"] = "111";
-            fooVo.Set("b", () => "222");
-            fooVo.Set("check1Invoked", () => "no!");
-            fooVo.Set("check1", () =>
-            {
-                fooVo["check1Invoked"] = "yes!";
-                return "check1";
-            });
+        //[HttpGet("GetLazyVo")]
+        //public string GetLazyVo()
+        //{
+        //    var fooVo = new FooLazyVo();
+        //    fooVo.SetPropertyFilter(ExpandoPropertyFilter.Create("check1"));
+        //    fooVo["a"] = "111";
+        //    fooVo.Set("b", () => "222");
+        //    fooVo.Set("check1Invoked", () => "no!");
+        //    fooVo.Set("check1", () =>
+        //    {
+        //        fooVo["check1Invoked"] = "yes!";
+        //        return "check1";
+        //    });
 
-            fooVo.Set("check2Invoked", () => "no!");
-            fooVo.Set("check2", () =>
-            {
-                fooVo["check2Invoked"] = "yes!";
-                return "check2";
-            });
+        //    fooVo.Set("check2Invoked", () => "no!");
+        //    fooVo.Set("check2", () =>
+        //    {
+        //        fooVo["check2Invoked"] = "yes!";
+        //        return "check2";
+        //    });
 
-            return JsonConvert.SerializeObject(fooVo, Formatting.Indented);
-        }
+        //    return JsonConvert.SerializeObject(fooVo, Formatting.Indented);
+        //}
 
-        [HttpGet("GetLazyVoAsync")]
-        public async Task<string> GetLazyVoAsync()
-        {
-            var fooVo = new FooLazyVo();
-            fooVo.SetPropertyFilter(ExpandoPropertyFilter.Create("check1"));
-            fooVo["a"] = "111";
-            fooVo.Set("b", () => "222");
+        //[HttpGet("GetLazyVoAsync")]
+        //public async Task<string> GetLazyVoAsync()
+        //{
+        //    var fooVo = new FooLazyVo();
+        //    fooVo.SetPropertyFilter(ExpandoPropertyFilter.Create("check1"));
+        //    fooVo["a"] = "111";
+        //    fooVo.Set("b", () => "222");
 
-            await fooVo.SetAsync("check1Invoked", () => Task.FromResult("async no!"));
-            await fooVo.SetAsync("check1", () =>
-            {
-                fooVo["check1Invoked"] = "async yes!";
-                return Task.FromResult("check1");
-            });
+        //    await fooVo.SetAsync("check1Invoked", () => Task.FromResult("async no!"));
+        //    await fooVo.SetAsync("check1", () =>
+        //    {
+        //        fooVo["check1Invoked"] = "async yes!";
+        //        return Task.FromResult("check1");
+        //    });
 
-            await fooVo.SetAsync("check2Invoked", () => Task.FromResult("async no!"));
-            await fooVo.SetAsync("check2", () =>
-            {
-                fooVo["check2Invoked"] = "async yes!";
-                return Task.FromResult("check2");
-            });
+        //    await fooVo.SetAsync("check2Invoked", () => Task.FromResult("async no!"));
+        //    await fooVo.SetAsync("check2", () =>
+        //    {
+        //        fooVo["check2Invoked"] = "async yes!";
+        //        return Task.FromResult("check2");
+        //    });
 
-            return JsonConvert.SerializeObject(fooVo, Formatting.Indented);
-        }
+        //    return JsonConvert.SerializeObject(fooVo, Formatting.Indented);
+        //}
     }
 
     public class FooVo : MyExpando

@@ -175,10 +175,17 @@ namespace Common.DynamicModel.Expandos
         {
             result = null;
 
-            // first check the Properties collection for member
-            if (Properties.Keys.Contains(binder.Name))
+            //// first check the Properties collection for member
+            //if (Properties.Keys.Contains(binder.Name))
+            //{
+            //    result = Properties[binder.Name];
+            //    return true;
+            //}
+
+            //wrap with lazy
+            if (LazyBag.TryGetLazyProp(binder.Name, out var theValue))
             {
-                result = Properties[binder.Name];
+                result = theValue;
                 return true;
             }
 
@@ -375,9 +382,16 @@ namespace Common.DynamicModel.Expandos
             }
             set
             {
-                if (Properties.ContainsKey(key))
+                //if (Properties.ContainsKey(key))
+                //{
+                //    Properties[key] = value;
+                //    return;
+                //}
+
+                //wrap with lazy
+                if (LazyBag.TryGetLazyProp(key, out var theValue))
                 {
-                    Properties[key] = value;
+                    LazyBag.TrySetLazyProp(key, theValue);
                     return;
                 }
 
@@ -476,5 +490,12 @@ namespace Common.DynamicModel.Expandos
             }
             return expando;
         }
+
+
+        public void SetLazyEnabled(bool enabled)
+        {
+            LazyBag.LazyDisabled = enabled;
+        }
+        protected PropertyLazyBag LazyBag => new PropertyLazyBag(Properties);
     }
 }

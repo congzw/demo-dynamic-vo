@@ -11,10 +11,9 @@ namespace Common.DynamicModel.Expandos
         void SetPropertyFilter(IExpandoPropertyFilter filter);
         IExpandoPropertyFilter GetPropertyFilter();
 
-        void Set<T>(string name, Func<T> func, bool ignoreFilter = false);
-        Task SetAsync<T>(string name, Func<Task<T>> func, bool ignoreFilter = false);
-
-        void Merge(object instance, bool greedy = true);
+        //void Set<T>(string name, Func<T> func, bool ignoreFilter = false);
+        //Task SetAsync<T>(string name, Func<Task<T>> func, bool ignoreFilter = false);
+        //void Merge(object instance, bool greedy = true);
     }
 
     public class MyExpando : Expando, IMyExpando
@@ -71,84 +70,89 @@ namespace Common.DynamicModel.Expandos
             }
         }
 
-        public void Set<TProperty>(string name, TProperty value, bool ignoreFilter = false)
+        //public void Set<TProperty>(string name, TProperty value, bool ignoreFilter = false)
+        //{
+        //    Set(name, () => value, ignoreFilter);
+        //}
+
+        //public void Set<T>(string name, Func<T> func, bool ignoreFilter = false)
+        //{
+        //    if (ignoreFilter)
+        //    {
+        //        this[name] = func.Invoke();
+        //        return;
+        //    }
+
+        //    if (GetPropertyFilter().Include(name))
+        //    {
+        //        this[name] = func.Invoke();
+        //    }
+        //}
+
+        //public async Task SetAsync<T>(string name, Func<Task<T>> func, bool ignoreFilter = false)
+        //{
+        //    if (ignoreFilter)
+        //    {
+        //        this[name] = func.Invoke();
+        //        return;
+        //    }
+
+        //    if (GetPropertyFilter().Include(name))
+        //    {
+        //        this[name] = await func.Invoke();
+        //    }
+        //}
+
+        //public void Merge(object instance, bool greedy = true)
+        //{
+        //    if (instance == null)
+        //    {
+        //        return;
+        //    }
+
+        //    var propertyInfos = instance.GetType()
+        //            .GetProperties(BindingFlags.Instance | BindingFlags.GetProperty | BindingFlags.Public)
+        //            .ToList();
+
+        //    foreach (var propertyInfo in propertyInfos)
+        //    {
+        //        var prop = propertyInfo;
+        //        if (!GetPropertyFilter().IncludeProp(propertyInfo))
+        //        {
+        //            continue;
+        //        }
+
+        //        if (greedy)
+        //        {
+        //            Set(prop.Name, () => prop.GetValue(instance, null));
+        //        }
+        //        else
+        //        {
+        //            if (PropertyExist(prop.Name))
+        //            {
+        //                Set(prop.Name, () => prop.GetValue(instance, null));
+        //            }
+        //        }
+
+        //    }
+        //}
+
+        //protected bool PropertyExist(string prop)
+        //{
+        //    var selfPropNames = GetProperties(true).Select(x => x.Key);
+        //    foreach (var selfPropName in selfPropNames)
+        //    {
+        //        if (selfPropName.Equals(prop, StringComparison.OrdinalIgnoreCase))
+        //        {
+        //            return true;
+        //        }
+        //    }
+        //    return false;
+        //}
+
+        public void Set<TProperty>(string name, TProperty value)
         {
-            Set(name, () => value, ignoreFilter);
-        }
-
-        public void Set<T>(string name, Func<T> func, bool ignoreFilter = false)
-        {
-            if (ignoreFilter)
-            {
-                this[name] = func.Invoke();
-                return;
-            }
-
-            if (GetPropertyFilter().Include(name))
-            {
-                this[name] = func.Invoke();
-            }
-        }
-
-        public async Task SetAsync<T>(string name, Func<Task<T>> func, bool ignoreFilter = false)
-        {
-            if (ignoreFilter)
-            {
-                this[name] = func.Invoke();
-                return;
-            }
-
-            if (GetPropertyFilter().Include(name))
-            {
-                this[name] = await func.Invoke();
-            }
-        }
-
-        public void Merge(object instance, bool greedy = true)
-        {
-            if (instance == null)
-            {
-                return;
-            }
-
-            var propertyInfos = instance.GetType()
-                    .GetProperties(BindingFlags.Instance | BindingFlags.GetProperty | BindingFlags.Public)
-                    .ToList();
-
-            foreach (var propertyInfo in propertyInfos)
-            {
-                var prop = propertyInfo;
-                if (!GetPropertyFilter().IncludeProp(propertyInfo))
-                {
-                    continue;
-                }
-
-                if (greedy)
-                {
-                    Set(prop.Name, () => prop.GetValue(instance, null));
-                }
-                else
-                {
-                    if (PropertyExist(prop.Name))
-                    {
-                        Set(prop.Name, () => prop.GetValue(instance, null));
-                    }
-                }
-
-            }
-        }
-
-        protected bool PropertyExist(string prop)
-        {
-            var selfPropNames = GetProperties(true).Select(x => x.Key);
-            foreach (var selfPropName in selfPropNames)
-            {
-                if (selfPropName.Equals(prop, StringComparison.OrdinalIgnoreCase))
-                {
-                    return true;
-                }
-            }
-            return false;
+            this[name] = value;
         }
     }
 }
