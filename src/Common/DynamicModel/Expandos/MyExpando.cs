@@ -40,35 +40,47 @@ namespace Common.DynamicModel.Expandos
         {
             return _propertyFilter ?? ExpandoPropertyFilter.Resolve();
         }
-        
-        protected override IEnumerable<KeyValuePair<string, object>> GetProperties(bool includeInstanceProperties = false)
+
+        protected override IEnumerable<string> GetReturnDynamicMembers()
         {
-            var props = base.GetProperties(includeInstanceProperties);
-
             var filter = GetPropertyFilter();
-            var ignorePropInfos = new List<PropertyInfo>();
-            foreach (var propertyInfo in InstancePropertyInfo)
-            {
-                if (!filter.IncludeProp(propertyInfo))
-                {
-                    ignorePropInfos.Add(propertyInfo);
-                }
-            }
-
-            foreach (var prop in props)
-            {
-                if (!filter.Include(prop.Key))
-                {
-                    continue;
-                }
-
-                if (ignorePropInfos.Any(x => prop.Key.Equals(x.Name, StringComparison.OrdinalIgnoreCase)))
-                {
-                    continue;
-                }
-                yield return prop;
-            }
+            return base.GetReturnDynamicMembers().Where(x => filter.IncludeDynamicProperty(x));
         }
+
+        protected override IEnumerable<PropertyInfo> GetReturnInstancePropertyInfos()
+        {
+            var filter = GetPropertyFilter();
+            return base.GetReturnInstancePropertyInfos().Where(x => filter.IncludeInstanceProperty(x));
+        }
+        
+        //protected override IEnumerable<KeyValuePair<string, object>> GetProperties(bool includeInstanceProperties = false)
+        //{
+        //    var props = base.GetProperties(includeInstanceProperties);
+
+        //    var filter = GetPropertyFilter();
+        //    var ignorePropInfos = new List<PropertyInfo>();
+        //    foreach (var propertyInfo in InstancePropertyInfo)
+        //    {
+        //        if (!filter.IncludeProp(propertyInfo))
+        //        {
+        //            ignorePropInfos.Add(propertyInfo);
+        //        }
+        //    }
+
+        //    foreach (var prop in props)
+        //    {
+        //        if (!filter.Include(prop.Key))
+        //        {
+        //            continue;
+        //        }
+
+        //        if (ignorePropInfos.Any(x => prop.Key.Equals(x.Name, StringComparison.OrdinalIgnoreCase)))
+        //        {
+        //            continue;
+        //        }
+        //        yield return prop;
+        //    }
+        //}
 
         //public void Set<TProperty>(string name, TProperty value, bool ignoreFilter = false)
         //{
@@ -153,6 +165,16 @@ namespace Common.DynamicModel.Expandos
         public void Set<TProperty>(string name, TProperty value)
         {
             this[name] = value;
+        }
+
+        public void Set<T>(string name, Func<T> func)
+        {
+            this[name] = func;
+        }
+
+        public void Set<T>(string name, Lazy<T> lazy)
+        {
+            this[name] = lazy;
         }
     }
 }

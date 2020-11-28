@@ -7,20 +7,20 @@ namespace Common.DynamicModel.Expandos
 {
     public interface IExpandoPropertyFilter
     {
-        public bool Include(string propName);
-        public bool IncludeProp(PropertyInfo propertyInfo);
+        public bool IncludeDynamicProperty(string propName);
+        public bool IncludeInstanceProperty(PropertyInfo propertyInfo);
     }
 
     public class ExpandoPropertyFilter : IExpandoPropertyFilter
     {
         public IList<string> Excludes { get; set; } = new List<string>();
 
-        public bool Include(string propName)
+        public bool IncludeDynamicProperty(string propName)
         {
             return !Excludes.Any(x => propName.Equals(x, StringComparison.OrdinalIgnoreCase));
         }
 
-        public bool IncludeProp(PropertyInfo propertyInfo)
+        public bool IncludeInstanceProperty(PropertyInfo propertyInfo)
         {
             var attributes = propertyInfo.GetCustomAttributes().ToList();
             foreach (var attribute in attributes)

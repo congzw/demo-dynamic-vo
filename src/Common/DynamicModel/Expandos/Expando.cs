@@ -158,12 +158,27 @@ namespace Common.DynamicModel.Expandos
         /// <returns></returns>
         public override IEnumerable<string> GetDynamicMemberNames()
         {
-            foreach (var item in GetProperties(true))
+            var memberNames = new List<string>();
+
+            //按需触发Lazy属性
+            var dynamicMembers = GetReturnDynamicMembers();
+            foreach (var dynamicMember in dynamicMembers)
             {
-                yield return item.Key;
+                memberNames.Add(dynamicMember);
+                if (LazyBag.CachedLazyProperties.ContainsKey(dynamicMember))
+                {
+                    LazyBag.TryGetLazyProp(dynamicMember, out var result);
+                }
             }
+
+            var instanceMembers = GetReturnInstancePropertyInfos();
+            foreach (var instanceMember in instanceMembers)
+            {
+                memberNames.Add(instanceMember.Name);
+            }
+            return memberNames;
         }
-        
+
         /// <summary>
         /// Try to retrieve a member by name first from instance properties
         /// followed by the collection entries.
@@ -175,20 +190,12 @@ namespace Common.DynamicModel.Expandos
         {
             result = null;
 
-            //// first check the Properties collection for member
-            //if (Properties.Keys.Contains(binder.Name))
-            //{
-            //    result = Properties[binder.Name];
-            //    return true;
-            //}
-
-            //wrap with lazy
-            if (LazyBag.TryGetLazyProp(binder.Name, out var theValue))
+            // first check the Properties collection for member
+            if (Properties.Keys.Contains(binder.Name))
             {
-                result = theValue;
+                result = Properties[binder.Name];
                 return true;
             }
-
 
             // Next check for Public properties via Reflection
             if (Instance != null)
@@ -364,64 +371,41 @@ namespace Common.DynamicModel.Expandos
         {
             get
             {
-                try
-                {
-                    // try to get from properties collection first
-                    return Properties[key];
-                }
-                catch (KeyNotFoundException)
-                {
-                    // try reflection on instanceType
-                    object result = null;
-                    if (GetProperty(Instance, key, out result))
-                        return result;
-
-                    // nope doesn't exist
-                    throw;
-                }
-            }
-            set
-            {
-                //if (Properties.ContainsKey(key))
-                //{
-                //    Properties[key] = value;
-                //    return;
-                //}
-
                 //wrap with lazy
                 if (LazyBag.TryGetLazyProp(key, out var theValue))
                 {
-                    LazyBag.TrySetLazyProp(key, theValue);
+                    return theValue;
+                }
+                
+                // try reflection on instanceType
+                if (GetProperty(Instance, key, out var result))
+                    return result;
+
+                return null;
+            }
+            set
+            {
+                if (!LazyBag.TryGetLazyProp(key, out var result))
+                {
+                    LazyBag.TrySetLazyProp(key, value);
                     return;
                 }
 
                 // check instance for existance of type first
                 var miArray = InstanceType.GetMember(key, BindingFlags.Public | BindingFlags.GetProperty | BindingFlags.Instance);
-                if (miArray != null && miArray.Length > 0)
+                if (miArray.Length > 0)
+                {
                     SetProperty(Instance, key, value);
+                }
                 else
-                    Properties[key] = value;
+                {
+                    //Properties[key] = value;
+                    //wrap with lazy
+                    LazyBag.TrySetLazyProp(key, value);
+                }
             }
         }
-        
-        /// <summary>
-        /// Returns and the properties of 
-        /// </summary>
-        /// <param name="includeProperties"></param>
-        /// <returns></returns>
-        protected virtual IEnumerable<KeyValuePair<string, object>> GetProperties(bool includeInstanceProperties = false)
-        {
-            if (includeInstanceProperties && Instance != null)
-            {
-                foreach (var prop in this.InstancePropertyInfo)
-                    yield return new KeyValuePair<string, object>(prop.Name, prop.GetValue(Instance, null));
-            }
 
-            foreach (var key in this.Properties.Keys)
-                yield return new KeyValuePair<string, object>(key, this.Properties[key]);
-
-        }
-        
         /// <summary>
         /// Checks whether a property exists in the Property collection
         /// or as a property on the instance
@@ -491,11 +475,32 @@ namespace Common.DynamicModel.Expandos
             return expando;
         }
 
-
-        public void SetLazyEnabled(bool enabled)
+        #region support lazy props
+        
+        private PropertyLazyBag _lazyBag;
+        protected PropertyLazyBag LazyBag
         {
-            LazyBag.LazyDisabled = enabled;
+            get { return _lazyBag ??= new PropertyLazyBag(Properties); }
         }
-        protected PropertyLazyBag LazyBag => new PropertyLazyBag(Properties);
+
+        /// <summary>
+        /// 最终返回的实例属性
+        /// </summary>
+        /// <returns></returns>
+        protected virtual IEnumerable<PropertyInfo> GetReturnInstancePropertyInfos()
+        {
+            return Instance != null ? this.InstancePropertyInfo : Enumerable.Empty<PropertyInfo>();
+        }
+
+        /// <summary>
+        /// 最终返回的动态属性
+        /// </summary>
+        /// <returns></returns>
+        protected virtual IEnumerable<string> GetReturnDynamicMembers()
+        {
+            return LazyBag.CachedLazyProperties.Keys;
+        }
+
+        #endregion
     }
 }

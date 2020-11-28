@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Common.DynamicModel.Expandos;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
@@ -26,100 +27,81 @@ namespace Common.DynamicModel
         }
 
         [TestMethod]
-        public void Indexer_AsLazy_Should_Ok()
+        public void Set_Instance_Should_Ok()
         {
             var fooVo = new FooVo();
-            fooVo.SetLazyEnabled(true);
             fooVo.Id = "001";
             fooVo.Name = "fooVo";
-
-            fooVo["check1"] = "check1";
-            fooVo["check2"] = "check2";
-            fooVo.SetPropertyFilter(ExpandoPropertyFilter.Create("check1"));
-
-            var json = fooVo.GetJson(true);
-
-            json.Contains("check1", StringComparison.OrdinalIgnoreCase).ShouldFalse();
-            json.Contains("check2", StringComparison.OrdinalIgnoreCase).ShouldTrue();
-        }
-
-        [TestMethod]
-        public void Indexer_AsNoLazy_Should_Ok()
-        {
-            var fooVo = new FooVo();
-            fooVo.SetLazyEnabled(false);
-
-            fooVo.Id = "001";
-            fooVo.Name = "fooVo";
-
-            fooVo["check1"] = "check1";
-            fooVo["check2"] = "check2";
-            var json = fooVo.GetJson(true);
-            json.Contains("check1", StringComparison.OrdinalIgnoreCase).ShouldTrue();
-            json.Contains("check2", StringComparison.OrdinalIgnoreCase).ShouldTrue();
+            fooVo.Set("check1", "check1Invoked");
+            fooVo.Set("check2", "check2Invoked");
 
             fooVo.SetPropertyFilter(ExpandoPropertyFilter.Create("check1"));
             var jsonFilter = fooVo.GetJson(true);
-            jsonFilter.Contains("check1", StringComparison.OrdinalIgnoreCase).ShouldFalse();
-            jsonFilter.Contains("check2", StringComparison.OrdinalIgnoreCase).ShouldTrue();
+            jsonFilter.Contains("check1Invoked", StringComparison.OrdinalIgnoreCase).ShouldFalse();
+            jsonFilter.Contains("check2Invoked", StringComparison.OrdinalIgnoreCase).ShouldTrue();
         }
 
-        //[TestMethod]
-        //public void Set_NoFilter_Should_Ok()
-        //{
-        //    var fooVo = new FooVo();
+        [TestMethod]
+        public void Set_Func_Should_Ok()
+        {
+            var fooVo = new FooVo();
+            fooVo.Id = "001";
+            fooVo.Name = "fooVo";
+            fooVo.Set("check1", () => "check1Invoked");
+            fooVo.Set("check2", () => "check2Invoked");
 
-        //    fooVo["a"] = "111";
-        //    fooVo.Set("b", () => "222");
+            fooVo.SetPropertyFilter(ExpandoPropertyFilter.Create("check1"));
+            var jsonFilter = fooVo.GetJson(true);
+            jsonFilter.Contains("check1Invoked", StringComparison.OrdinalIgnoreCase).ShouldFalse();
+            jsonFilter.Contains("check2Invoked", StringComparison.OrdinalIgnoreCase).ShouldTrue();
+        }
 
-        //    fooVo.Set("check1Invoked", () => "");
-        //    fooVo.Set("check1", () =>
-        //    {
-        //        fooVo["check1Invoked"] = "check1Invoked:true";
-        //        return "check1";
-        //    });
+        [TestMethod]
+        public void Set_Lazy_Should_Ok()
+        {
+            var fooVo = new FooVo();
+            fooVo.Id = "001";
+            fooVo.Name = "fooVo";
+            fooVo.Set("check1", new Lazy<string>(() => "check1Invoked"));
+            fooVo.Set("check2", new Lazy<string>(() => "check2Invoked"));
 
-        //    fooVo.Set("check2Invoked", () => "");
-        //    fooVo.Set("check2", () =>
-        //    {
-        //        fooVo["check2Invoked"] = "check2Invoked:true";
-        //        return "check2";
-        //    });
+            fooVo.SetPropertyFilter(ExpandoPropertyFilter.Create("check1"));
+            var jsonFilter = fooVo.GetJson(true);
+            jsonFilter.Contains("check1Invoked", StringComparison.OrdinalIgnoreCase).ShouldFalse();
+            jsonFilter.Contains("check2Invoked", StringComparison.OrdinalIgnoreCase).ShouldTrue();
+        }
 
+        [TestMethod]
+        public void Set_Delay_Should_Ok()
+        {
+            var fooVo = new FooVo();
+            fooVo.Id = "001";
+            fooVo.Name = "fooVo";
+            fooVo.Set("check1", () =>
+            {
+                fooVo.Name += "+check1";
+                return "foo";
+            });
+            fooVo.Set("check2", () =>
+            {
+                fooVo.Name += "+check2";
+                return "foo";
+            });
 
-        //    var json = fooVo.GetJson().Log();
-        //    json.Contains("check1Invoked:true").ShouldTrue();
-        //    json.Contains("check2Invoked:true").ShouldTrue();
-        //}
+            fooVo.SetPropertyFilter(ExpandoPropertyFilter.Create("check1"));
+            var jsonFilter = fooVo.GetJson(true);
+            jsonFilter.Contains("+check1", StringComparison.OrdinalIgnoreCase).ShouldFalse();
+            jsonFilter.Contains("+check2", StringComparison.OrdinalIgnoreCase).ShouldTrue();
 
-        //[TestMethod]
-        //public void Set_WithFilter_Should_Ok()
-        //{
-        //    var fooVo = new FooVo();
-        //    fooVo.SetPropertyFilter(ExpandoPropertyFilter.Create("check1"));
+            fooVo.Name.ShouldEqual("fooVo+check2");
+        }
 
-        //    fooVo["a"] = "111";
-        //    fooVo.Set("b", () => "222");
-
-        //    fooVo.Set("check1Invoked", () => "");
-        //    fooVo.Set("check1", () =>
-        //    {
-        //        fooVo["check1Invoked"] = "check1Invoked:true";
-        //        return "check1";
-        //    });
-
-        //    fooVo.Set("check2Invoked", () => "");
-        //    fooVo.Set("check2", () =>
-        //    {
-        //        fooVo["check2Invoked"] = "check2Invoked:true";
-        //        return "check2";
-        //    });
-
-
-        //    var json = JsonConvert.SerializeObject(fooVo, Formatting.Indented).Log();
-        //    json.Contains("check1Invoked:true").ShouldFalse();
-        //    json.Contains("check2Invoked:true").ShouldTrue();
-        //}
+        [TestMethod]
+        public void Try_Find_LazyWrapType()
+        {
+            Func<string> funcValue = () => "123";
+            funcValue.GetType().GetGenericTypeDefinition().IsAssignableFrom(typeof(Func<>)).Log("funcType.IsAssignableFrom(typeof(Func<>) => ");
+        }
 
         //[TestMethod]
         //public void Merge_Greedy_Should_Ok()
