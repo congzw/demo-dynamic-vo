@@ -53,6 +53,17 @@ namespace NbSites.Web.Controllers
             return JsonConvert.SerializeObject(expando, Formatting.Indented);
         }
 
+        [HttpGet("GetVo4")]
+        public string GetVo4()
+        {
+            var expando = new MyExpando();
+            expando.SetPropertyFilter(ExpandoPropertyFilter.Create("bad"));
+            expando.Set("A", () => Task.FromResult("abc"));
+            expando.Set("B", async () => await Task.FromResult("abc"));
+            expando.Set("bad", () => Task.FromResult("bad"));
+            return JsonConvert.SerializeObject(expando, Formatting.Indented);
+        }
+
         //[HttpGet("GetLazyVo")]
         //public string GetLazyVo()
         //{
