@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Common.DynamicModel.Expandos;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -7,6 +8,16 @@ namespace Common.DynamicModel
     [TestClass]
     public class PropertyLazyBagSpec
     {
+        [TestMethod]
+        public void IsSyncFuncType_Should_Ok()
+        {
+            Func<string> syncFunc = () => "abc";
+            var syncFuncType = syncFunc.GetType();
+            syncFuncType.IsFuncType().Log("syncFuncType.IsFuncType() => ").ShouldTrue();
+            syncFuncType.IsSyncFuncType().Log("syncFuncType.IsSyncFuncType() => ").ShouldTrue();
+            syncFuncType.IsAsyncFuncType().Log("syncFuncType.IsAsyncFuncType() => ").ShouldFalse();
+        }
+
         [TestMethod]
         public void TryWrapAsLazy_Object_Should_Ok()
         {
