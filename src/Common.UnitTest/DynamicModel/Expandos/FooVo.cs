@@ -1,8 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Common.DynamicModel.Expandos;
 
-namespace Common.DynamicModel
+namespace Common.DynamicModel.Expandos
 {
     public class FooVo : MyExpando
     {

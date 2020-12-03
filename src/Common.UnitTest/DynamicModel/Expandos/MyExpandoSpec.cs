@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Linq;
-using Common.DynamicModel.Expandos;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
 
-namespace Common.DynamicModel
+namespace Common.DynamicModel.Expandos
 {
     [TestClass]
     public class MyExpandoSpec
@@ -97,13 +95,6 @@ namespace Common.DynamicModel
         }
 
         [TestMethod]
-        public void Try_Find_LazyWrapType()
-        {
-            Func<string> funcValue = () => "123";
-            funcValue.GetType().GetGenericTypeDefinition().IsAssignableFrom(typeof(Func<>)).Log("funcType.IsAssignableFrom(typeof(Func<>) => ");
-        }
-
-        [TestMethod]
         public void Merge_Should_Ok()
         {
             var fooVo = new FooVo();
@@ -119,22 +110,5 @@ namespace Common.DynamicModel
             json.Contains("entity name", StringComparison.OrdinalIgnoreCase).ShouldTrue();
             json.Contains("entity desc", StringComparison.OrdinalIgnoreCase).ShouldTrue();
         }
-
-        //[TestMethod]
-        //public void Merge_NotGreedy_Should_Ok()
-        //{
-        //    var fooVo = new FooVo();
-
-        //    var fooEntity = new FooEntity();
-        //    fooEntity.Id = "entity id";
-        //    fooEntity.Name = "entity name";
-        //    fooEntity.Desc = "entity desc";
-        //    fooVo.Merge(fooEntity, false);
-
-        //    var json = JsonConvert.SerializeObject(fooVo, Formatting.Indented).Log();
-        //    json.Contains("entity id", StringComparison.OrdinalIgnoreCase).ShouldTrue();
-        //    json.Contains("entity name", StringComparison.OrdinalIgnoreCase).ShouldTrue();
-        //    json.Contains("entity desc", StringComparison.OrdinalIgnoreCase).ShouldFalse();
-        //}
     }
 }
