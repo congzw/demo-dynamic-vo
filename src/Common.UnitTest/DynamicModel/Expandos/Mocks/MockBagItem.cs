@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 
+// ReSharper disable once CheckNamespace
 namespace Common.DynamicModel.Expandos
 {
     public class MockBagItem

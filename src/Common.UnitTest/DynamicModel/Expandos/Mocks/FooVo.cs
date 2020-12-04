@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
+// ReSharper disable once CheckNamespace
 namespace Common.DynamicModel.Expandos
 {
     public class FooVo : MyExpando
