@@ -66,9 +66,9 @@ namespace NbSites.Web.Controllers
         }
         
         [HttpGet("GetSelect")]
-        public ExpandoQueryContext GetSelect()
+        public ExpandoSelect GetSelect()
         {
-           return ExpandoQueryContext.Parse(this.HttpContext);
+           return ExpandoSelect.Parse(this.HttpContext);
         }
 
         [HttpGet("GetSelectVo")]
@@ -88,7 +88,7 @@ namespace NbSites.Web.Controllers
             //=> {"a":"A","id":"theId","name":"theName","title":"theTitle","description":"theDesc"}
 
             //todo: add auto filter to pipelines
-            var expandoQueryContext = ExpandoQueryContext.Parse(this.HttpContext);
+            var expandoQueryContext = ExpandoSelect.Parse(this.HttpContext);
             if (expandoQueryContext.Includes.Count > 0)
             {
                 fooVo.AddPropertyFilter(ExpandoPropertyFilterFactory.CreateIncludeFilter(expandoQueryContext.Includes.ToArray()));

@@ -5,14 +5,14 @@ using Microsoft.AspNetCore.Http;
 
 namespace Common.DynamicModel.Expandos
 {
-    public class ExpandoQueryContext
+    public class ExpandoSelect
     {
         public IList<string> Includes { get; set; } = new List<string>();
         public IList<string> Excludes { get; set; } = new List<string>();
 
-        public static ExpandoQueryContext Parse(HttpContext httpContext)
+        public static ExpandoSelect Parse(HttpContext httpContext)
         {
-            var queryArgs = new ExpandoQueryContext();
+            var queryArgs = new ExpandoSelect();
             if (httpContext == null)
             {
                 return queryArgs;
