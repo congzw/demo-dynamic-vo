@@ -30,7 +30,7 @@ namespace NbSites.Web.Controllers
         public string GetVo2()
         {
             var fooVo = new FooVo2();
-            var expando = new MyExpando(fooVo);
+            var expando = new ExpandoModel(fooVo);
             expando.AddPropertyFilter(ExpandoPropertyFilterFactory.CreateExcludeFilter("bad"));
 
             dynamic dynamicVo = expando;
@@ -43,7 +43,7 @@ namespace NbSites.Web.Controllers
         [HttpGet("GetVo3")]
         public string GetVo3()
         {
-            var expando = new MyExpando();
+            var expando = new ExpandoModel();
             expando.AddPropertyFilter(ExpandoPropertyFilterFactory.CreateExcludeFilter("bad"));
 
             dynamic dynamicVo = expando;
@@ -56,7 +56,7 @@ namespace NbSites.Web.Controllers
         [HttpGet("GetVo4")]
         public string GetVo4()
         {
-            var expando = new MyExpando();
+            var expando = new ExpandoModel();
             expando.AddPropertyFilter(ExpandoPropertyFilterFactory.CreateExcludeFilter("bad"));
             expando.Set("A", () => Task.FromResult("abc"));
             expando.Set("B", async () => await Task.FromResult("abc"));
@@ -114,7 +114,7 @@ namespace NbSites.Web.Controllers
         //}
     }
 
-    public class FooVo : MyExpando
+    public class FooVo : ExpandoModel
     {
         public string Id { get; set; }
         public string Name { get; set; }
@@ -130,7 +130,7 @@ namespace NbSites.Web.Controllers
         public string Description { get; set; }
     }
 
-    public class FooLazyVo : MyExpando
+    public class FooLazyVo : ExpandoModel
     {
         public string Id { get; set; }
         public string Name { get; set; }

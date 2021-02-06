@@ -5,22 +5,22 @@ using System.Reflection;
 
 namespace Common.DynamicModel.Expandos
 {
-    public interface IMyExpando
+    public interface IExpandoModel
     {
         void AddPropertyFilter(IExpandoPropertyFilter filter);
         IExpandoPropertyFilter GetPropertyFilter();
     }
 
-    public class MyExpando : Expando, IMyExpando
+    public class ExpandoModel : Expando, IExpandoModel
     {
-        public MyExpando()
+        public ExpandoModel()
         {
         }
-        public MyExpando(object instance)
+        public ExpandoModel(object instance)
             : base(instance)
         {
         }
-        public MyExpando(IDictionary<string, object> dict)
+        public ExpandoModel(IDictionary<string, object> dict)
             : base(dict)
         {
         }
@@ -79,10 +79,65 @@ namespace Common.DynamicModel.Expandos
                     .GetProperties(BindingFlags.Instance | BindingFlags.GetProperty | BindingFlags.Public)
                     .ToList();
 
+            var thisPropertyInfos = this.GetReturnInstancePropertyInfos().ToList();
             foreach (var propertyInfo in propertyInfos)
             {
-                Set(propertyInfo.Name, propertyInfo.GetValue(instance, null));
+                var theOne = thisPropertyInfos.FirstOrDefault(x => x.Name == propertyInfo.Name);
+                if (theOne != null)
+                {
+                    theOne.SetValue(this, propertyInfo.GetValue(instance, null));
+                }
+                else
+                {
+                    Set(propertyInfo.Name, propertyInfo.GetValue(instance, null));
+                }
             }
+        }
+
+        #region helpers
+
+        public static ExpandoModel CreateExpandoModel(object instance, IExpandoPropertyFilter filter = null)
+        {
+            var expando = new ExpandoModel();
+            expando.AddPropertyFilter(filter);
+            expando.Merge(instance);
+            return expando;
+        }
+
+        #endregion
+    }
+
+    public static class ExpandoModelExtensions
+    {
+        public static ExpandoModel AsExpandoModel(this object instance, IExpandoPropertyFilter filter = null)
+        {
+            if (instance is ExpandoModel expandoModel)
+            {
+                if (filter != null)
+                {
+                    expandoModel.AddPropertyFilter(filter);
+                }
+                return expandoModel;
+            }
+
+            var expando = new ExpandoModel();
+            expando.AddPropertyFilter(filter);
+            expando.Merge(instance);
+            return expando;
+        }
+
+        public static T AsExpandoModel<T>(this object instance, IExpandoPropertyFilter filter = null) where T : ExpandoModel, new()
+        {
+            if (instance is T expandoModel)
+            {
+                expandoModel.AddPropertyFilter(filter);
+                return expandoModel;
+            }
+
+            var expando = new T();
+            expando.AddPropertyFilter(filter);
+            expando.Merge(instance);
+            return expando;
         }
     }
 }

@@ -85,9 +85,12 @@ namespace Common.DynamicModel.Expandos
         public IList<IExpandoPropertyFilter> Filters { get; set; } = new List<IExpandoPropertyFilter>();
         public void AddPropertyFilter(IExpandoPropertyFilter filter)
         {
-            if (!Filters.Contains(filter))
+            if (filter != null)
             {
-                Filters.Add(filter);
+                if (!Filters.Contains(filter))
+                {
+                    Filters.Add(filter);
+                }
             }
         }
 

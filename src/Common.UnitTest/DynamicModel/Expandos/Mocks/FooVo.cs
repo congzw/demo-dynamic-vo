@@ -4,7 +4,7 @@ using System.Linq;
 // ReSharper disable once CheckNamespace
 namespace Common.DynamicModel.Expandos
 {
-    public class FooVo : MyExpando
+    public class FooVo : ExpandoModel
     {
         public string Id { get; set; }
         public string Name { get; set; }
@@ -20,7 +20,7 @@ namespace Common.DynamicModel.Expandos
         {
             var memberNames = base.GetDynamicMemberNames();
             var list = memberNames.ToList();
-            ("get dynamic names => " + string.Join(',', list)).Log();
+            ("get all members => " + string.Join(',', list)).Log();
             return list;
         }
     }

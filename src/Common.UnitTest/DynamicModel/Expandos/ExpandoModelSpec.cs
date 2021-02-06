@@ -5,7 +5,7 @@ using Newtonsoft.Json;
 namespace Common.DynamicModel.Expandos
 {
     [TestClass]
-    public class MyExpandoSpec
+    public class ExpandoModelSpec
     {
         [TestMethod]
         public void JsonIgnore_CleanVo_Should_Ok()
@@ -22,6 +22,20 @@ namespace Common.DynamicModel.Expandos
             var json = JsonConvert.SerializeObject(fooVo, Formatting.Indented).Log();
             json.Contains(nameof(fooVo.MsIgnored), StringComparison.OrdinalIgnoreCase).ShouldFalse();
             json.Contains(nameof(fooVo.NewtonIgnored), StringComparison.OrdinalIgnoreCase).ShouldFalse();
+        }
+
+        [TestMethod]
+        public void Default_Should_Include_ALL()
+        {
+            var fooVo = new FooVo();
+            fooVo.Id = "001";
+            fooVo.Name = "fooVo";
+            fooVo.Set("check1", "check1Invoked");
+            fooVo.Set("check2", "check2Invoked");
+
+            var jsonFilter = fooVo.GetJson(true);
+            jsonFilter.Contains("check1Invoked", StringComparison.OrdinalIgnoreCase).ShouldTrue();
+            jsonFilter.Contains("check2Invoked", StringComparison.OrdinalIgnoreCase).ShouldTrue();
         }
 
         [TestMethod]
@@ -104,11 +118,46 @@ namespace Common.DynamicModel.Expandos
             fooEntity.Name = "entity name";
             fooEntity.Desc = "entity desc";
             fooVo.Merge(fooEntity);
-
+            
             var json = JsonConvert.SerializeObject(fooVo, Formatting.Indented).Log();
             json.Contains("entity id", StringComparison.OrdinalIgnoreCase).ShouldTrue();
             json.Contains("entity name", StringComparison.OrdinalIgnoreCase).ShouldTrue();
             json.Contains("entity desc", StringComparison.OrdinalIgnoreCase).ShouldTrue();
+        }
+
+        [TestMethod]
+        public void AsExpandoModel_Should_Ok()
+        {
+            var fooEntity = new FooEntity();
+            fooEntity.Id = "entity id";
+            fooEntity.Name = "entity name";
+            fooEntity.Desc = "entity desc";
+
+            var excludeFilter = ExpandoPropertyFilterFactory.CreateExcludeFilter("Desc");
+            var fooExpando = fooEntity.AsExpandoModel(excludeFilter);
+
+            var json = JsonConvert.SerializeObject(fooExpando, Formatting.Indented).Log();
+            json.Contains("entity id", StringComparison.OrdinalIgnoreCase).ShouldTrue();
+            json.Contains("entity name", StringComparison.OrdinalIgnoreCase).ShouldTrue();
+            json.Contains("entity desc", StringComparison.OrdinalIgnoreCase).ShouldFalse();
+        }
+
+        [TestMethod]
+        public void AsExpandoVo_Should_Ok()
+        {
+            var fooEntity = new FooEntity();
+            fooEntity.Id = "entity id";
+            fooEntity.Name = "entity name";
+            fooEntity.Desc = "entity desc";
+            
+            var fooVo = fooEntity.AsExpandoModel<FooVo>();
+            fooVo.Id.ShouldEqual(fooEntity.Id);
+            fooVo.Name.ShouldEqual(fooEntity.Name);
+
+            var jsonVo = JsonConvert.SerializeObject(fooVo, Formatting.Indented).Log();
+            jsonVo.Contains("entity id", StringComparison.OrdinalIgnoreCase).ShouldTrue();
+            jsonVo.Contains("entity name", StringComparison.OrdinalIgnoreCase).ShouldTrue();
+            jsonVo.Contains("entity desc", StringComparison.OrdinalIgnoreCase).ShouldTrue();
         }
     }
 }
