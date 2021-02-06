@@ -24,9 +24,9 @@ namespace Common.DynamicModel.Expandos
             : base(dict)
         {
         }
-        
+
         //for filter extensions 
-        private readonly ExpandoPropertyCompositeFilter _propertyFilters = new ExpandoPropertyCompositeFilter();
+        internal ExpandoPropertyCompositeFilter _propertyFilters = new ExpandoPropertyCompositeFilter();
         public void AddPropertyFilter(IExpandoPropertyFilter filter)
         {
             _propertyFilters.AddPropertyFilter(filter);
@@ -67,7 +67,7 @@ namespace Common.DynamicModel.Expandos
         {
             this[name] = lazy;
         }
-        
+
         public void Merge(object instance)
         {
             if (instance == null)
@@ -93,18 +93,6 @@ namespace Common.DynamicModel.Expandos
                 }
             }
         }
-
-        #region helpers
-
-        public static ExpandoModel CreateExpandoModel(object instance, IExpandoPropertyFilter filter = null)
-        {
-            var expando = new ExpandoModel();
-            expando.AddPropertyFilter(filter);
-            expando.Merge(instance);
-            return expando;
-        }
-
-        #endregion
     }
 
     public static class ExpandoModelExtensions
@@ -138,6 +126,20 @@ namespace Common.DynamicModel.Expandos
             expando.AddPropertyFilter(filter);
             expando.Merge(instance);
             return expando;
+        }
+
+        public static T IncludeAll<T>(this T expandoModel) where T : ExpandoModel
+        {
+            expandoModel._propertyFilters.Filters.Clear();
+            expandoModel.AddPropertyFilter(ExpandoPropertyFilterFactory.CreateIncludeFilter("*"));
+            return expandoModel;
+        }
+
+        public static T IncludeNone<T>(this T expandoModel) where T : ExpandoModel
+        {
+            expandoModel._propertyFilters.Filters.Clear();
+            expandoModel.AddPropertyFilter(ExpandoPropertyFilterFactory.CreateIncludeFilter());
+            return expandoModel;
         }
     }
 }

@@ -35,4 +35,50 @@ namespace Common.DynamicModel.Expandos
             return queryArgs;
         }
     }
+
+    public static class ExpandoSelectExtensions
+    {
+        /// <summary>
+        /// 使用ExpandoSelect过滤expando属性
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="expando"></param>
+        /// <param name="expandoSelect"></param>
+        /// <returns></returns>
+        public static T ApplyExpandoSelect<T>(this T expando, ExpandoSelect expandoSelect) where T : ExpandoModel
+        {
+            if (expandoSelect.Includes.Count > 0)
+            {
+                expando.AddPropertyFilter(ExpandoPropertyFilterFactory.CreateIncludeFilter(expandoSelect.Includes.ToArray()));
+            }
+            if (expandoSelect.Excludes.Count > 0)
+            {
+                expando.AddPropertyFilter(ExpandoPropertyFilterFactory.CreateIncludeFilter(expandoSelect.Excludes.ToArray()));
+            }
+            return expando;
+        }
+
+        /// <summary>
+        /// 使用ExpandoSelect过滤expando属性
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="expandoSelect"></param>
+        /// <param name="expandos"></param>
+        /// <returns></returns>
+        public static IEnumerable<T> ApplyExpandoSelect<T>(this ExpandoSelect expandoSelect, IEnumerable<T> expandos) where T : ExpandoModel
+        {
+            foreach (var expando in expandos)
+            {
+                if (expandoSelect.Includes.Count > 0)
+                {
+                    expando.AddPropertyFilter(ExpandoPropertyFilterFactory.CreateIncludeFilter(expandoSelect.Includes.ToArray()));
+                }
+                if (expandoSelect.Excludes.Count > 0)
+                {
+                    expando.AddPropertyFilter(ExpandoPropertyFilterFactory.CreateIncludeFilter(expandoSelect.Excludes.ToArray()));
+                }
+                yield return expando;
+            }
+        }
+    }
 }

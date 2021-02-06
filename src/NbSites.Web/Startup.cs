@@ -1,3 +1,4 @@
+using Common.DynamicModel.Expandos;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
@@ -16,6 +17,8 @@ namespace NbSites.Web
                 options.UseCamelCasing(true);
                 options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
             });
+
+            ExpandoPropertyFilterFactory.ResolveDefaultMode = () => ExpandoPropertyIncludeFilterDefaultMode.None;
             services.AddControllersWithViews();
         }
         

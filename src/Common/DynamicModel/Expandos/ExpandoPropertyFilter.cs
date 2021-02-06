@@ -137,9 +137,21 @@ namespace Common.DynamicModel.Expandos
         }
 
         //default is empty filter, support for extensions, eg: filter by context query string, etc...
-        private static readonly Lazy<ExpandoPropertyIncludeFilter> IncludeAllLazy = new Lazy<ExpandoPropertyIncludeFilter>(() => new ExpandoPropertyIncludeFilter(){Includes = new List<string> { "*" } });
-        public static Func<IExpandoPropertyFilter> Resolve = () => IncludeAllLazy.Value;
+        private static readonly Lazy<ExpandoPropertyIncludeFilter> IncludeAllLazy = new Lazy<ExpandoPropertyIncludeFilter>(() => new ExpandoPropertyIncludeFilter() { Includes = new List<string> { "*" } });
+        private static readonly Lazy<ExpandoPropertyIncludeFilter> IncludeNoneLazy = new Lazy<ExpandoPropertyIncludeFilter>(() => new ExpandoPropertyIncludeFilter());
+        public static Func<IExpandoPropertyFilter> Resolve = () => ResolveDefaultMode() == ExpandoPropertyIncludeFilterDefaultMode.None ? IncludeNoneLazy.Value : IncludeAllLazy.Value;
+
+        /// <summary>
+        /// 自动过滤的默认模式：None, All
+        /// </summary>
+        public static Func<ExpandoPropertyIncludeFilterDefaultMode> ResolveDefaultMode = () => ExpandoPropertyIncludeFilterDefaultMode.All;
 
         #endregion
+    }
+
+    public enum ExpandoPropertyIncludeFilterDefaultMode
+    {
+        None = 0,
+        All = 1
     }
 }

@@ -28,6 +28,7 @@ namespace Common.DynamicModel.Expandos
         public void Default_Should_Include_ALL()
         {
             var fooVo = new FooVo();
+            
             fooVo.Id = "001";
             fooVo.Name = "fooVo";
             fooVo.Set("check1", "check1Invoked");
@@ -118,7 +119,9 @@ namespace Common.DynamicModel.Expandos
             fooEntity.Name = "entity name";
             fooEntity.Desc = "entity desc";
             fooVo.Merge(fooEntity);
-            
+
+            //fooVo.IncludeAll();
+
             var json = JsonConvert.SerializeObject(fooVo, Formatting.Indented).Log();
             json.Contains("entity id", StringComparison.OrdinalIgnoreCase).ShouldTrue();
             json.Contains("entity name", StringComparison.OrdinalIgnoreCase).ShouldTrue();

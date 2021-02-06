@@ -88,16 +88,31 @@ namespace NbSites.Web.Controllers
             //=> {"a":"A","id":"theId","name":"theName","title":"theTitle","description":"theDesc"}
 
             //todo: add auto filter to pipelines
-            var expandoQueryContext = ExpandoSelect.Parse(this.HttpContext);
-            if (expandoQueryContext.Includes.Count > 0)
+            var expandoSelect = ExpandoSelect.Parse(this.HttpContext);
+            return fooVo.ApplyExpandoSelect(expandoSelect);
+        }
+
+        [HttpGet("GetSelectVoNoX")]
+        public FooVo GetSelectVoNoX()
+        {
+            var fooVo = new FooVo();
+            fooVo.Id = "theId";
+            fooVo.Name = "theName";
+            fooVo.Title = "theTitle";
+            fooVo.Description = "theDesc";
+
+            fooVo.Set("a", "A");
+            fooVo.Set("b", "B");
+            fooVo.Set("C", "CC");
+            fooVo.Set("x", () =>
             {
-                fooVo.AddPropertyFilter(ExpandoPropertyFilterFactory.CreateIncludeFilter(expandoQueryContext.Includes.ToArray()));
-            }
-            if (expandoQueryContext.Excludes.Count > 0)
-            {
-                fooVo.AddPropertyFilter(ExpandoPropertyFilterFactory.CreateIncludeFilter(expandoQueryContext.Excludes.ToArray()));
-            }
-            return fooVo;
+                throw new InvalidOperationException("x is not allowed for now!");
+                return "XXX";
+            });
+            
+            //todo: add auto filter to pipelines
+            var expandoSelect = ExpandoSelect.Parse(this.HttpContext);
+            return fooVo.ApplyExpandoSelect(expandoSelect);
         }
     }
 

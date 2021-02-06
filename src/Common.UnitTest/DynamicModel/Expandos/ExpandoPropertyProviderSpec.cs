@@ -28,6 +28,8 @@ namespace Common.DynamicModel.Expandos
             fooVo.Id = "001";
             fooVo.Name = "fooVo";
 
+            //fooVo.IncludeAll();
+
             var fooVoContext = ExpandoPropertyContext<FooVo>.Create(fooVo);
             AsyncHelper.RunSync(async () => { await fooVoContext.ApplyProviders(new List<IExpandoPropertyProvider<FooVo>> { new MockProvider1(), new MockProvider2() }); });
             
