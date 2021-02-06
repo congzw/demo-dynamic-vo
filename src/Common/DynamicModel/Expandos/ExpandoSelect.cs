@@ -9,30 +9,43 @@ namespace Common.DynamicModel.Expandos
     {
         public IList<string> Includes { get; set; } = new List<string>();
         public IList<string> Excludes { get; set; } = new List<string>();
+        public string IncludesRawValue { get; set; } = string.Empty;
+        public string ExcludesRawValue { get; set; } = string.Empty;
+
+        /// <summary>
+        /// 是否包含选择参数
+        /// </summary>
+        /// <returns></returns>
+        public bool HasSelectParams()
+        {
+            return Includes.Count > 0 || Excludes.Count > 0;
+        }
 
         public static ExpandoSelect Parse(HttpContext httpContext)
         {
-            var queryArgs = new ExpandoSelect();
+            var expandoSelect = new ExpandoSelect();
             if (httpContext == null)
             {
-                return queryArgs;
+                return expandoSelect;
             }
 
             httpContext.Request.Query.TryGetValue("$includes", out var includesValue);
+            expandoSelect.IncludesRawValue = includesValue;
             var includes = includesValue.ToString().Split(",", StringSplitOptions.RemoveEmptyEntries).ToArray();
             if (includes.Length > 0)
             {
-                queryArgs.Includes = includes;
+                expandoSelect.Includes = includes;
             }
 
             httpContext.Request.Query.TryGetValue("$excludes", out var excludesValue);
+            expandoSelect.ExcludesRawValue = excludesValue;
             var excludes = excludesValue.ToString().Split(",", StringSplitOptions.RemoveEmptyEntries).ToArray();
             if (excludes.Length > 0)
             {
-                queryArgs.Excludes = excludes;
+                expandoSelect.Excludes = excludes;
             }
 
-            return queryArgs;
+            return expandoSelect;
         }
     }
 
@@ -62,10 +75,10 @@ namespace Common.DynamicModel.Expandos
         /// 使用ExpandoSelect过滤expando属性
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="expandoSelect"></param>
         /// <param name="expandos"></param>
+        /// <param name="expandoSelect"></param>
         /// <returns></returns>
-        public static IEnumerable<T> ApplyExpandoSelect<T>(this ExpandoSelect expandoSelect, IEnumerable<T> expandos) where T : ExpandoModel
+        public static IEnumerable<T> ApplyExpandoSelect<T>(this IEnumerable<T> expandos, ExpandoSelect expandoSelect) where T : ExpandoModel
         {
             foreach (var expando in expandos)
             {

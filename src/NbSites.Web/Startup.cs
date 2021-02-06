@@ -1,4 +1,5 @@
 using Common.DynamicModel.Expandos;
+using Common.DynamicModel.Expandos.Web;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
@@ -12,16 +13,16 @@ namespace NbSites.Web
         public void ConfigureServices(IServiceCollection services)
         {
             //services.AddMvc();
-            services.AddMvcCore().AddNewtonsoftJson(options =>
+            services.AddControllersWithViews().AddNewtonsoftJson(options =>
             {
                 options.UseCamelCasing(true);
                 options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+            }).AddExpandoSelectFilter(options =>
+            {
+                options.DefaultMode = ExpandoPropertyIncludeFilterDefaultMode.None;
             });
-
-            ExpandoPropertyFilterFactory.ResolveDefaultMode = () => ExpandoPropertyIncludeFilterDefaultMode.None;
-            services.AddControllersWithViews();
         }
-        
+
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
