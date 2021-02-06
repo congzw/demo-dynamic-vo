@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Newtonsoft.Json;
 
 namespace NbSites.Web
 {
@@ -10,9 +11,14 @@ namespace NbSites.Web
         public void ConfigureServices(IServiceCollection services)
         {
             //services.AddMvc();
+            services.AddMvcCore().AddNewtonsoftJson(options =>
+            {
+                options.UseCamelCasing(true);
+                options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+            });
             services.AddControllersWithViews();
         }
-
+        
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
@@ -24,7 +30,7 @@ namespace NbSites.Web
             app.UseStaticFiles();
 
             app.UseRouting();
-            
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapDefaultControllerRoute();

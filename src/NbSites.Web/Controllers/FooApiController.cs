@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Common.DynamicModel.Expandos;
 using Microsoft.AspNetCore.Mvc;
@@ -63,55 +64,41 @@ namespace NbSites.Web.Controllers
             expando.Set("bad", () => Task.FromResult("bad"));
             return JsonConvert.SerializeObject(expando, Formatting.Indented);
         }
+        
+        [HttpGet("GetSelect")]
+        public ExpandoQueryContext GetSelect()
+        {
+           return ExpandoQueryContext.Parse(this.HttpContext);
+        }
 
-        //[HttpGet("GetLazyVo")]
-        //public string GetLazyVo()
-        //{
-        //    var fooVo = new FooLazyVo();
-        //    fooVo.SetPropertyFilter(ExpandoPropertyFilter.Create("check1"));
-        //    fooVo["a"] = "111";
-        //    fooVo.Set("b", () => "222");
-        //    fooVo.Set("check1Invoked", () => "no!");
-        //    fooVo.Set("check1", () =>
-        //    {
-        //        fooVo["check1Invoked"] = "yes!";
-        //        return "check1";
-        //    });
+        [HttpGet("GetSelectVo")]
+        public FooVo GetSelectVo()
+        {
+            var fooVo = new FooVo();
+            fooVo.Id = "theId";
+            fooVo.Name = "theName";
+            fooVo.Title = "theTitle";
+            fooVo.Description = "theDesc";
 
-        //    fooVo.Set("check2Invoked", () => "no!");
-        //    fooVo.Set("check2", () =>
-        //    {
-        //        fooVo["check2Invoked"] = "yes!";
-        //        return "check2";
-        //    });
+            fooVo.Set("a", "A");
+            fooVo.Set("b", "B");
+            fooVo.Set("C", "CC");
 
-        //    return JsonConvert.SerializeObject(fooVo, Formatting.Indented);
-        //}
+            //=> ~/Api/Foo/GetSelectVo?$includes=a,b&$excludes=b,c
+            //=> {"a":"A","id":"theId","name":"theName","title":"theTitle","description":"theDesc"}
 
-        //[HttpGet("GetLazyVoAsync")]
-        //public async Task<string> GetLazyVoAsync()
-        //{
-        //    var fooVo = new FooLazyVo();
-        //    fooVo.SetPropertyFilter(ExpandoPropertyFilter.Create("check1"));
-        //    fooVo["a"] = "111";
-        //    fooVo.Set("b", () => "222");
-
-        //    await fooVo.SetAsync("check1Invoked", () => Task.FromResult("async no!"));
-        //    await fooVo.SetAsync("check1", () =>
-        //    {
-        //        fooVo["check1Invoked"] = "async yes!";
-        //        return Task.FromResult("check1");
-        //    });
-
-        //    await fooVo.SetAsync("check2Invoked", () => Task.FromResult("async no!"));
-        //    await fooVo.SetAsync("check2", () =>
-        //    {
-        //        fooVo["check2Invoked"] = "async yes!";
-        //        return Task.FromResult("check2");
-        //    });
-
-        //    return JsonConvert.SerializeObject(fooVo, Formatting.Indented);
-        //}
+            //todo: add auto filter to pipelines
+            var expandoQueryContext = ExpandoQueryContext.Parse(this.HttpContext);
+            if (expandoQueryContext.Includes.Count > 0)
+            {
+                fooVo.AddPropertyFilter(ExpandoPropertyFilterFactory.CreateIncludeFilter(expandoQueryContext.Includes.ToArray()));
+            }
+            if (expandoQueryContext.Excludes.Count > 0)
+            {
+                fooVo.AddPropertyFilter(ExpandoPropertyFilterFactory.CreateIncludeFilter(expandoQueryContext.Excludes.ToArray()));
+            }
+            return fooVo;
+        }
     }
 
     public class FooVo : ExpandoModel
