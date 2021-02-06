@@ -19,7 +19,7 @@ namespace NbSites.Web.Controllers
         public string GetVo()
         {
             var fooVo = new FooVo();
-            fooVo.SetPropertyFilter(ExpandoPropertyFilter.Create("bad"));
+            fooVo.AddPropertyFilter(ExpandoPropertyFilterFactory.CreateExcludeFilter("bad"));
             fooVo["a"] = "111";
             fooVo["bad"] = "bad";
             fooVo["good"] = "good";
@@ -31,7 +31,7 @@ namespace NbSites.Web.Controllers
         {
             var fooVo = new FooVo2();
             var expando = new MyExpando(fooVo);
-            expando.SetPropertyFilter(ExpandoPropertyFilter.Create("bad"));
+            expando.AddPropertyFilter(ExpandoPropertyFilterFactory.CreateExcludeFilter("bad"));
 
             dynamic dynamicVo = expando;
             dynamicVo.a = "222";
@@ -44,7 +44,7 @@ namespace NbSites.Web.Controllers
         public string GetVo3()
         {
             var expando = new MyExpando();
-            expando.SetPropertyFilter(ExpandoPropertyFilter.Create("bad"));
+            expando.AddPropertyFilter(ExpandoPropertyFilterFactory.CreateExcludeFilter("bad"));
 
             dynamic dynamicVo = expando;
             dynamicVo.a = "222";
@@ -57,7 +57,7 @@ namespace NbSites.Web.Controllers
         public string GetVo4()
         {
             var expando = new MyExpando();
-            expando.SetPropertyFilter(ExpandoPropertyFilter.Create("bad"));
+            expando.AddPropertyFilter(ExpandoPropertyFilterFactory.CreateExcludeFilter("bad"));
             expando.Set("A", () => Task.FromResult("abc"));
             expando.Set("B", async () => await Task.FromResult("abc"));
             expando.Set("bad", () => Task.FromResult("bad"));

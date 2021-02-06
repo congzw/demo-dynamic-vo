@@ -33,7 +33,7 @@ namespace Common.DynamicModel.Expandos
             fooVo.Set("check1", "check1Invoked");
             fooVo.Set("check2", "check2Invoked");
 
-            fooVo.SetPropertyFilter(ExpandoPropertyFilter.Create("check1"));
+            fooVo.AddPropertyFilter(ExpandoPropertyFilterFactory.CreateExcludeFilter("check1"));
             var jsonFilter = fooVo.GetJson(true);
             jsonFilter.Contains("check1Invoked", StringComparison.OrdinalIgnoreCase).ShouldFalse();
             jsonFilter.Contains("check2Invoked", StringComparison.OrdinalIgnoreCase).ShouldTrue();
@@ -48,7 +48,7 @@ namespace Common.DynamicModel.Expandos
             fooVo.Set("check1", () => "check1Invoked");
             fooVo.Set("check2", () => "check2Invoked");
 
-            fooVo.SetPropertyFilter(ExpandoPropertyFilter.Create("check1"));
+            fooVo.AddPropertyFilter(ExpandoPropertyFilterFactory.CreateExcludeFilter("check1"));
             var jsonFilter = fooVo.GetJson(true);
             jsonFilter.Contains("check1Invoked", StringComparison.OrdinalIgnoreCase).ShouldFalse();
             jsonFilter.Contains("check2Invoked", StringComparison.OrdinalIgnoreCase).ShouldTrue();
@@ -63,7 +63,7 @@ namespace Common.DynamicModel.Expandos
             fooVo.Set("check1", new Lazy<string>(() => "check1Invoked"));
             fooVo.Set("check2", new Lazy<string>(() => "check2Invoked"));
 
-            fooVo.SetPropertyFilter(ExpandoPropertyFilter.Create("check1"));
+            fooVo.AddPropertyFilter(ExpandoPropertyFilterFactory.CreateExcludeFilter("check1"));
             var jsonFilter = fooVo.GetJson(true);
             jsonFilter.Contains("check1Invoked", StringComparison.OrdinalIgnoreCase).ShouldFalse();
             jsonFilter.Contains("check2Invoked", StringComparison.OrdinalIgnoreCase).ShouldTrue();
@@ -86,7 +86,7 @@ namespace Common.DynamicModel.Expandos
                 return "foo";
             });
 
-            fooVo.SetPropertyFilter(ExpandoPropertyFilter.Create("check1"));
+            fooVo.AddPropertyFilter(ExpandoPropertyFilterFactory.CreateExcludeFilter("check1"));
             var jsonFilter = fooVo.GetJson(true);
             jsonFilter.Contains("+check1", StringComparison.OrdinalIgnoreCase).ShouldFalse();
             jsonFilter.Contains("+check2", StringComparison.OrdinalIgnoreCase).ShouldTrue();

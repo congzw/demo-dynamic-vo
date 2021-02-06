@@ -14,17 +14,11 @@ namespace Common.DynamicModel.Expandos
             var fooVo = new FooVo();
             fooVo.Id = "001";
             fooVo.Name = "fooVo";
-            fooVo.Set("check1", new Lazy<string>(() => "check1Invoked"));
-            fooVo.Set("check2", new Lazy<string>(() => "check2Invoked"));
-
             var fooVoContext = ExpandoPropertyContext<FooVo>.Create(fooVo);
-
             AsyncHelper.RunSync(async () => { await fooVoContext.ApplyProviders(null); });
-
-            fooVo.SetPropertyFilter(ExpandoPropertyFilter.Create("check1"));
             var jsonFilter = fooVo.GetJson(true);
-            jsonFilter.Contains("check1Invoked", StringComparison.OrdinalIgnoreCase).ShouldFalse();
-            jsonFilter.Contains("check2Invoked", StringComparison.OrdinalIgnoreCase).ShouldTrue();
+            jsonFilter.Contains("provider1Invoked", StringComparison.OrdinalIgnoreCase).ShouldFalse();
+            jsonFilter.Contains("provider2Invoked", StringComparison.OrdinalIgnoreCase).ShouldFalse();
         }
 
         [TestMethod]
@@ -33,18 +27,11 @@ namespace Common.DynamicModel.Expandos
             var fooVo = new FooVo();
             fooVo.Id = "001";
             fooVo.Name = "fooVo";
-            fooVo.Set("check1", new Lazy<string>(() => "check1Invoked"));
-            fooVo.Set("check2", new Lazy<string>(() => "check2Invoked"));
 
             var fooVoContext = ExpandoPropertyContext<FooVo>.Create(fooVo);
-
-            var providers = new List<IExpandoPropertyProvider<FooVo>> {new MockProvider1(), new MockProvider2()};
-            AsyncHelper.RunSync(async () => { await fooVoContext.ApplyProviders(providers); });
-
-            fooVo.SetPropertyFilter(ExpandoPropertyFilter.Create("check1"));
+            AsyncHelper.RunSync(async () => { await fooVoContext.ApplyProviders(new List<IExpandoPropertyProvider<FooVo>> { new MockProvider1(), new MockProvider2() }); });
+            
             var jsonFilter = fooVo.GetJson(true);
-            jsonFilter.Contains("check1Invoked", StringComparison.OrdinalIgnoreCase).ShouldFalse();
-            jsonFilter.Contains("check2Invoked", StringComparison.OrdinalIgnoreCase).ShouldTrue();
             jsonFilter.Contains("provider1Invoked", StringComparison.OrdinalIgnoreCase).ShouldTrue();
             jsonFilter.Contains("provider2Invoked", StringComparison.OrdinalIgnoreCase).ShouldTrue();
         }

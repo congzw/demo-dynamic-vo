@@ -2,18 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Threading.Tasks;
 
 namespace Common.DynamicModel.Expandos
 {
     public interface IMyExpando
     {
-        void SetPropertyFilter(IExpandoPropertyFilter filter);
+        void AddPropertyFilter(IExpandoPropertyFilter filter);
         IExpandoPropertyFilter GetPropertyFilter();
-
-        //void Set<T>(string name, Func<T> func, bool ignoreFilter = false);
-        //Task SetAsync<T>(string name, Func<Task<T>> func, bool ignoreFilter = false);
-        //void Merge(object instance, bool greedy = true);
     }
 
     public class MyExpando : Expando, IMyExpando
@@ -29,16 +24,21 @@ namespace Common.DynamicModel.Expandos
             : base(dict)
         {
         }
-
+        
         //for filter extensions 
-        private IExpandoPropertyFilter _propertyFilter;
-        public void SetPropertyFilter(IExpandoPropertyFilter filter)
+        private readonly ExpandoPropertyCompositeFilter _propertyFilters = new ExpandoPropertyCompositeFilter();
+        public void AddPropertyFilter(IExpandoPropertyFilter filter)
         {
-            _propertyFilter = filter;
+            _propertyFilters.AddPropertyFilter(filter);
         }
+
         public IExpandoPropertyFilter GetPropertyFilter()
         {
-            return _propertyFilter ?? ExpandoPropertyFilter.Resolve();
+            if (_propertyFilters.Filters.Count == 0)
+            {
+                return ExpandoPropertyFilterFactory.Resolve();
+            }
+            return _propertyFilters;
         }
 
         protected override IEnumerable<string> GetReturnDynamicMembers()
